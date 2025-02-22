@@ -5,7 +5,7 @@ const {
     getDoctor,
     createDoctor,
     UpdateDoctor,
-    deleteDoctor
+    deleteDoctor,
 } = require("../controllers/doctors")
 
 router.route("/").get(getAllDoctors).post(createDoctor);

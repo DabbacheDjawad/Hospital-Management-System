@@ -10,7 +10,7 @@ import Patient from '../Pages/Patient'
 
 function App() {
   return (
-    <>  
+    <div className=''>  
       <Header />
       <Routes>
           <Route path='/' element={<Home />} />
@@ -20,7 +20,7 @@ function App() {
           <Route path='/appointment' element={<Appointment />} />
           <Route path='/patients' element={<Patient />} />
       </Routes>
-    </>
+    </div>
   )
 }
 

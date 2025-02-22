@@ -2,14 +2,18 @@ const Doctor = require('../models/doctorModel')
 const {StatusCodes} = require("http-status-codes")
 const {NotFound , BadRequest} = require('../errors/indexErros');
 // get all Doctors
-const getAllDoctors = async (req , res) =>{
-    const doctors = await Doctor.find().sort("name");
+const getAllDoctors = async (req , res) =>{ 
+    let queryObject = {};
+    const {name} = req.query;
+    if(name){
+        queryObject.name = name;
+    }
+    const doctors = await Doctor.find(queryObject).sort("name");
     res.status(StatusCodes.OK).json({doctors , count : doctors.length});
 }
 
 // get single Doctor
 const getDoctor = async(req , res) =>{
-   
     const {id : doctorID} = req.params;
     const doctors = await Doctor.find()
     const doctor = await Doctor.findOne({_id : doctors[doctorID]});
