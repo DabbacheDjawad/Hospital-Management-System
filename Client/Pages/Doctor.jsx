@@ -7,6 +7,8 @@ const Doctor = () => {
   const [doctors , setDoctors] = useState([]);
   const [response , setResponse] = useState("");
   const [searchResponse , setSearchResponse] = useState("");
+  // const [UpdateResponse , setUpdateResponse] = useState("");later update
+  // const [removeResponse , setRemoveResponse] = useState("")later update
 
   const [name , setDoctorName] = useState("");
   const [specialty , setDoctorSpecialty] = useState("");
@@ -52,10 +54,6 @@ const Doctor = () => {
 
   function handleSearch(e){
     setSearch(e.target.value);
-  }
-
-  function handleUpdate(){
-    setUpdate(!update);
   }
 
 
@@ -119,10 +117,10 @@ const Doctor = () => {
   }
 
 
-  async function removeDoctor(index){
+  async function removeDoctor(id){
     try{
       const token = localStorage.getItem("token");
-      await axios.delete(`http://localhost:3000/api/v1/doctors/${index}` , {
+      await axios.delete(`http://localhost:3000/api/v1/doctors/${id}` , {
         headers : {
           Authorization : `Bearer ${token}`
         }
@@ -136,21 +134,18 @@ const Doctor = () => {
 
       setDoctors(data.doctors)
     }catch(error){
-      console.log(error);
-      
+      if(error.status === 404) setRemoveResponse(`No Doctor with the ID : ${id}`)
     }
   }
 
 
-  async function UpdateDoctor(index){
-    console.log(index);
-    
+  async function UpdateDoctor(id){
       try{
           const token = localStorage.getItem("token");
           const name = updatedName;
           const specialty = updatedSpecialty;
           const workingDays = updatedWorkingDays;
-          const {updatedDoctor} = await axios.patch(`http://localhost:3000/api/v1/doctors/${index}`,
+          const {updatedDoctor} = await axios.patch(`http://localhost:3000/api/v1/doctors/${id}`,
           {name , specialty , workingDays},
           {headers : {
               Authorization : `Bearer ${token}`
@@ -211,9 +206,9 @@ const Doctor = () => {
 
               <Button onClick={SearchDoctor} className={`mr-2`}>Search</Button>
           </div>
-          <p className="text-white text-center mt-10 font-semibold text-2xl">{searchResponse}</p>
-
-          <ul className="flex flex-col gap-18 lg:gap-5 xl:gap-5 mt-10 items-center text-xl lg:text-2xl xl:text-2xl ">{
+          <p className="text-white text-center mt-10 font-semibold text-2xl">{searchResponse}</p>          
+          <ul key={Math.floor(Math.random()*1000)}
+           className="flex flex-col gap-18 lg:gap-5 xl:gap-5 mt-10 items-center text-xl lg:text-2xl xl:text-2xl ">{
               doctors.map((doctor , index)=>(
                 <div className="flex w-[90%] gap-5 flex-col lg:flex-row xl:flex-row">
                   <li key={index} className="flex flex-col bg-white w-full gap-3 rounded-lg p-5">
@@ -224,7 +219,7 @@ const Doctor = () => {
 
                     {/* Update Section (Hidden) */}
                     {update === index && (
-          <div className="flex flex-col gap-6">
+          <div key={index} className="flex flex-col gap-6">
             <input
               type="text"
               placeholder="New Name"
@@ -246,14 +241,16 @@ const Doctor = () => {
               onChange={handleUpdatedWorkingDays}
               value={updatedWorkingDays}
             />
-            <Button onClick={() => UpdateDoctor(index)}>Confirm</Button>
+            <Button onClick={() => UpdateDoctor(doctor._id)}>Confirm</Button>
           </div>
         )}
                   </li>
                   
-                  <div className="flex gap-3  lg:flex-col xl:flex-col justify-center">
-                    <Button onClick={()=>removeDoctor(index)}>Remove Doctor</Button>
-                    <Button onClick={()=>setUpdate(update===index ? null : index)}>Update Doctor</Button>
+                  <div key={index+1} className="flex gap-3  lg:flex-col xl:flex-col justify-center">
+                    <Button onClick={()=>{
+                      removeDoctor(doctor._id)
+                      }}>Remove Doctor</Button>
+                    <Button onClick={()=>setUpdate(update===index ? null : index)}>{!update?"Update Doctor":"Cancel"}</Button>
                   </div>
                 </div>
               ))
