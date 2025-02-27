@@ -7,7 +7,7 @@ const Doctor = () => {
   const [doctors , setDoctors] = useState([]);
   const [response , setResponse] = useState("");
   const [searchResponse , setSearchResponse] = useState("");
-  // const [UpdateResponse , setUpdateResponse] = useState("");later update
+  const [UpdateResponse , setUpdateResponse] = useState("")
   // const [removeResponse , setRemoveResponse] = useState("")later update
 
   const [name , setDoctorName] = useState("");
@@ -75,7 +75,7 @@ const Doctor = () => {
     try{
       const token = localStorage.getItem("token");
       
-      const {doctor} =await axios.post("http://localhost:3000/api/v1/doctors",
+      const response =await axios.post("http://localhost:3000/api/v1/doctors",
        {name , specialty , workingDays} , 
        { headers : {
         Authorization : `Bearer ${token}`}})
@@ -85,7 +85,8 @@ const Doctor = () => {
             Authorization: `Bearer ${token}`,
           },
         });
-        setDoctors(data.doctors);
+        setDoctors([...data.doctors]);
+        
         setDoctorName("");
         setDoctorSpecialty("");
         setDoctorWorkingDays("");
@@ -140,6 +141,7 @@ const Doctor = () => {
 
 
   async function UpdateDoctor(id){
+    setUpdateResponse("")
       try{
           const token = localStorage.getItem("token");
           const name = updatedName;
@@ -162,7 +164,7 @@ const Doctor = () => {
           setDoctors(data.doctors);
 
       }catch(error){
-        console.log(error)
+        if(error.status === 404) setUpdateResponse("Something Wrong with the Server! Please try again Later")
       }
   }
 
@@ -207,11 +209,12 @@ const Doctor = () => {
               <Button onClick={SearchDoctor} className={`mr-2`}>Search</Button>
           </div>
           <p className="text-white text-center mt-10 font-semibold text-2xl">{searchResponse}</p>          
-          <ul key={Math.floor(Math.random()*1000)}
+          <ul
            className="flex flex-col gap-18 lg:gap-5 xl:gap-5 mt-10 items-center text-xl lg:text-2xl xl:text-2xl ">{
               doctors.map((doctor , index)=>(
                 <div className="flex w-[90%] gap-5 flex-col lg:flex-row xl:flex-row">
                   <li key={index} className="flex flex-col bg-white w-full gap-3 rounded-lg p-5">
+                  <span className="flex"><p className="text-[#092137] font-bold">ID</p>: {doctor._id}</span>
                     <span className="flex"><p className="text-[#092137] font-bold">Name</p> : {doctor.name}</span>
                     <span className="flex"><p className="text-[#092137] font-bold">Speacialty</p>: {doctor.specialty}</span>
                     <span className="flex"><p className="text-[#092137] font-bold">Working Days</p>: {doctor.workingDays+''}</span>
@@ -250,9 +253,9 @@ const Doctor = () => {
                     <Button onClick={()=>{
                       removeDoctor(doctor._id)
                       }}>Remove Doctor</Button>
-                    <Button onClick={()=>setUpdate(update===index ? null : index)}>{!update?"Update Doctor":"Cancel"}</Button>
+                    <Button onClick={()=>setUpdate(update===index ? null : index)}>{update !== index?"Update Doctor":"Cancel"}</Button>
                   </div>
-                </div>
+                  <p className="text-red-700 text-center mt-10 font-semibold text-2xl">{update === index? UpdateResponse:""}</p>                </div>
               ))
             }</ul>
         </div>

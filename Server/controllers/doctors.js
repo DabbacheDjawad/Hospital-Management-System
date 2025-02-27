@@ -32,7 +32,9 @@ const createDoctor = async (req , res) =>{
 const UpdateDoctor = async (req , res) =>{
     const {name , specialty , workingDays} = req.body;
     const {id : doctorID} = req.params;
+
     if(!name || !specialty) throw new BadRequest("the fields 'name' and 'specialty' can not be left empty")
+    
     const doctor =await Doctor.findOneAndUpdate({_id :doctorID} ,req.body, {new : true , runvalidators : true });
     if(!doctor) throw new NotFound(`no doctor with the id : ${doctorID}`);
     res.status(StatusCodes.OK).json({doctor});

@@ -7,7 +7,13 @@ const {BadRequest , NotFound} = require("../errors/indexErros")
 
 // get all appointments
 const getAllAppointments = async (req , res) =>{
-    const appointments = await Appointment.find().sort("date");
+    let queryObject = {};
+    const {id} = req.query;
+    if(id){
+        queryObject._id = id;
+    }
+
+    const appointments = await Appointment.find(queryObject).sort("date");
     
     res.status(StatusCodes.OK).json({appointments , count : appointments.length});
 }
@@ -41,10 +47,8 @@ const UpdateAppointment = async (req , res) =>{
 
     if(!status || !date) throw new BadRequest("the fields 'status' and 'date' can not be left empty")
 
-    const appointments = await Appointment.find();
     const appointment = await Appointment.findOneAndUpdate(
-        {_id : appointments[appointmentID]} , req.body , {new : true , runValidators : true}
-    );
+        {_id : appointmentID} , req.body , {new : true , runValidators : true});
 
     if(!appointment) throw new NotFound(`no Appointment with the id : ${appointmentID}`);
     res.status(StatusCodes.OK).json({appointment});
@@ -53,8 +57,7 @@ const UpdateAppointment = async (req , res) =>{
 // Delete appointments
 const deleteAppointment = async (req , res) =>{
     const {id : appointmentID} = req.params;
-    const appointments = await Appointment.find();
-    const appointment = await Appointment.findOneAndDelete({_id : appointments[appointmentID]});
+    const appointment = await Appointment.findOneAndDelete({_id : appointmentID});
     res.status(StatusCodes.OK).send();
 }
 

@@ -8,7 +8,8 @@ const [patients , setPatients] = useState([])
 const [response , setResponse] = useState("");
 const [searchResponse , setSearchResponse] = useState("");
 const [search , setSearch] = useState("");
-
+const [updateResponse , setUpdateResponse] = useState("");
+const [removeResponse , setRemoveResponse]= useState("")
 
 //properties
 const [name , setPatientName] = useState("");
@@ -23,9 +24,6 @@ const [update , setUpdate] = useState(null);
 const [updatedPatientName , setUpdatedPatientName] = useState("");
 const [updatedPhoneNb , setUpdatedPhoneNb] = useState("");
 const [updatedPatientDoctor , setUpdatedPatientDoctor] = useState("");
-const [updatedPatientAppointment , setUpdatedPatientAppointment] = useState("");
-const [updatedPatientIllness , setUpdatedPatientIllness] = useState("");
-
 
 useEffect(() => {
   async function fetchData() {
@@ -88,15 +86,6 @@ function handleUpdatedPatientDoctor(e){
   setUpdatedPatientDoctor(e.target.value);
 }
 
-function handleUpdatedPatientAppointment(e){
-  setUpdatedPatientAppointment(e.target.value);
-}
-
-function handleUpdatedPatientIllness(e){
-  setUpdatedPatientIllness(e.target.value);
-}
-
-
 
 //CRUD
 async function addPatient(e){
@@ -105,24 +94,31 @@ async function addPatient(e){
   try{
     const token = localStorage.getItem("token");
     
-    const {patient} =await axios.post("http://localhost:3000/api/v1/patients",
-     {name , phoneNumber ,doctor ,appointments, illness} , 
-     { headers : {
-      Authorization:`Bearer ${token}`}})
+    if(appointments !==""){
+      const response =await axios.post("http://localhost:3000/api/v1/patients",
+        {name ,phoneNumber , doctor , appointments , illness} , 
+        { headers : {
+         Authorization : `Bearer ${token}`}})
+    }else{
+      const response =await axios.post("http://localhost:3000/api/v1/patients",
+        {name ,phoneNumber , doctor , illness} , 
+        { headers : {
+         Authorization : `Bearer ${token}`}})
+    }
+
 
       const { data } = await axios.get("http://localhost:3000/api/v1/patients", {
         headers: {
-          Authorization:`Bearer ${token}`,
+          Authorization: `Bearer ${token}`,
         },
       });
-      setPatients(data.patients);
+      setPatients([...data.patients]);
       
       setPatientName("")
       setPhoneNb("")
       setPatientDoctor("")
-      setPatientAppointment("")
+      setPatientAppointment("");
       setPatientIllness("")
-
   }catch(error){
       setResponse(error.message);
   }
@@ -169,7 +165,7 @@ async function removePatient(id){
       },
     });
 
-    setPatients(data.patients)
+    setPatients([...data.patients]);
   }catch(error){
     if(error.status === 404) setRemoveResponse(`No Patients with the ID : ${id}`)
   }
@@ -177,7 +173,8 @@ async function removePatient(id){
 
 
 
-async function UpdatePatient(id){
+async function UpdatePatient(id , doctor){
+  setUpdateResponse("")
   try{
       const token = localStorage.getItem("token");
       const name = updatedPatientName;
@@ -200,7 +197,7 @@ async function UpdatePatient(id){
       setPatients(data.patients);
 
   }catch(error){
-    console.log(error)
+    if(error.status === 404) setUpdateResponse(`Something went wrong with the server , please recheck your doctor ID`)     
   }
 }
 
@@ -210,7 +207,7 @@ async function UpdatePatient(id){
         <div className="mt-12">
 
           {/* add a Patient */}
-        <h1 className="text-center underline text-white font-semibold text-2xl mb-10">Add a Doctor</h1>
+        <h1 className="text-center underline text-white font-semibold text-2xl mb-10">Add a Patient</h1>
           <div className="flex flex-col items-center lg:flex-row xl:flex-row gap-6 w-full md:justify-center lg:justify-center xl:justify-center">
 
             {/* patient's Name */}
@@ -259,11 +256,12 @@ async function UpdatePatient(id){
               <Button onClick={SearchPatient} className={`mr-2`}>Search</Button>
           </div>
           <p className="text-white text-center mt-10 font-semibold text-2xl">{searchResponse}</p>          
-          <ul key={Math.floor(Math.random()*1000)}
+          <ul
            className="flex flex-col gap-18 lg:gap-5 xl:gap-5 mt-10 items-center text-xl lg:text-2xl xl:text-2xl ">{
               patients.map((patient , index)=>(
                 <div className="flex w-[90%] gap-5 flex-col lg:flex-row xl:flex-row">
                   <li key={index} className="flex flex-col bg-white w-full gap-3 rounded-lg p-5">
+                  <span className="flex"><p className="text-[#092137] font-bold">ID</p>: {patient._id}</span>
                     <span className="flex"><p className="text-[#092137] font-bold">Name</p> : {patient.name}</span>
                     <span className="flex"><p className="text-[#092137] font-bold">Phone Nb</p>: {patient.phoneNumber}</span>
                     <span className="flex"><p className="text-[#092137] font-bold">Appointed Doctor</p>: {patient.doctor}</span>
@@ -273,7 +271,7 @@ async function UpdatePatient(id){
 
                     {/* Update Section (Hidden) */}
                     {update === index && (
-          <div key={index} className="flex flex-col gap-6">
+          <div className="flex flex-col gap-6">
             <input
               type="text"
               placeholder="New Name"
@@ -282,7 +280,7 @@ async function UpdatePatient(id){
               value={updatedPatientName}
             />
             <input
-              type="text"
+              type="tel"
               placeholder="New Phone Nb"
               className="outline-1 xl:w-[50%] lg:w-[60%] md:w-[70%] outline-gray-500 rounded-md text-2xl p-3 w-[80%] bg-white ml-2"
               onChange={handleUpdatedPatientPhoneNb}
@@ -295,9 +293,11 @@ async function UpdatePatient(id){
               onChange={handleUpdatedPatientDoctor}
               value={updatedPatientDoctor}
             />
+            
+            
 
 
-            <Button onClick={() => UpdatePatient(patient._id)}>Confirm</Button>
+            <Button onClick={() => UpdatePatient(patient._id , updatedPatientDoctor)}>Confirm</Button>
           </div>
         )}
                   </li>
@@ -306,8 +306,9 @@ async function UpdatePatient(id){
                     <Button onClick={()=>{
                       removePatient(patient._id)
                       }}>Remove Patient</Button>
-                    <Button onClick={()=>setUpdate(update===index ? null : index)}>{!update?"Update Patient":"Cancel"}</Button>
+                    <Button onClick={()=>setUpdate(update===index ? null : index)}>{update !==index?"Update Patient":"Cancel"}</Button>
                   </div>
+                  <p className="text-red-700 text-center mt-10 font-semibold text-2xl">{update ===index? updateResponse:""}</p>
                 </div>
               ))
             }</ul>
