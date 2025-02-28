@@ -1,17 +1,23 @@
 import Button from "../Components/Button";
 import { useState} from "react";
 import axios from "axios"
+import { useNavigate } from "react-router-dom";
 const Login = () => {
 
   const [data , setData] = useState([{}]);
   const [email , setEmail] = useState("");
   const [password , setPassword] = useState("");
   const [response , setResponse] = useState("");
+  const navigate = useNavigate();
+
+  function handleNavigation(destination){
+    navigate(`/${destination}`);
+  }
 
   async function handleLogin(e){
     e.preventDefault();
       try{
-        const token = localStorage.getItem("token")
+        const token = localStorage.getItem("token")        
 
         const {data} = await axios.post("http://localhost:3000/api/v1/auth/login",{email , password} ,
          { headers : {
@@ -41,10 +47,10 @@ function handlePasswordChange(event){
 
   return (
     <div
-      className="fixed top-[100px] left-[5%] md:left-[12%] lg:left-[16%] xl:left-[25%] border-1 border-[rgba(0,0,0,0.2)]
+      className="border-1 border-[rgba(0,0,0,0.2)]
        shadow-2xl lg:w-[70%] xl:w-[50%] md:w-[80%] m-auto w-[90%] mt-24"
     >
-      <form action="" className="flex flex-col gap-10 p-10 mt-12 mb-12">
+      <form action="" className="flex flex-col gap-10 p-10 mt-12">
         {/* email */}
         <div className="flex gap-2 items-center">
           <label className="mr-[6%] text-xl md:text-2xl lg:text-2xl xl:text-2xl text-[rgba(1,0,0,0.91)]">
@@ -78,6 +84,7 @@ function handlePasswordChange(event){
         </div>
         <div>
         <p className="text-center font-bold text-2xl">{response}</p>
+        {response ==="User Logged In" ? setTimeout(()=>handleNavigation("") , 3000):""}
         </div>
       </form>
     </div>
@@ -90,4 +97,5 @@ export default Login
 <input type="text" placeholder="Search for a Doctor"
  className="w-[50%] bg-white px-8 py-4 rounded-lg border-none text-2xl outline-0 active:outline-0"/>
  <Button>Search</Button>
-</form> */}
+</form> */ }
+// left-[5%] md:left-[12%] lg:left-[16%] xl:left-[25%] 

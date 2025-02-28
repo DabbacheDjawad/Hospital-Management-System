@@ -1,6 +1,7 @@
 import Button from "../Components/Button";
 import { useState} from "react";
 import axios from "axios"
+import { useNavigate } from "react-router-dom";
 const Register = () => {
 
   const [data , setData] = useState([{}]);
@@ -11,6 +12,13 @@ const Register = () => {
   const [password , setPassword] = useState("");
 
   const [response , setResponse] = useState("");
+
+
+  const navigate = useNavigate();
+  function handleNavigation(destination){
+    navigate(`/${destination}`);
+  }
+
 
   async function handleRegister(e){
     e.preventDefault();
@@ -50,10 +58,10 @@ function handleRoleChange(event){
 
   return (
     <div
-      className="fixed top-[100px] left-[5%] md:left-[12%] lg:left-[16%] xl:left-[25%] border-1 border-[rgba(0,0,0,0.2)]
-       shadow-2xl lg:w-[70%] xl:w-[50%] md:w-[80%] m-auto w-[90%] mt-24"
+      className="border-1 border-[rgba(0,0,0,0.2)]
+       shadow-2xl lg:w-[70%] xl:w-[50%] md:w-[80%] m-auto w-[90%] mt-24 mb-10"
     >
-      <form action="" className="flex flex-col gap-10 p-10 mt-12 mb-12">
+      <form className="flex flex-col gap-10 px-10 py-5 mt-12">
 
          
           {/*Name*/}
@@ -118,6 +126,7 @@ function handleRoleChange(event){
         </div>
         <div>
           <p className="text-center font-bold text-2xl">{response}</p>
+          {response ==="User Registered" ? setTimeout(()=>handleNavigation("") , 3000):""}
         </div>
       </form>
     </div>
@@ -125,3 +134,4 @@ function handleRoleChange(event){
 };
 
 export default Register;
+// left-[5%] md:left-[12%] lg:left-[16%] xl:left-[25%] 

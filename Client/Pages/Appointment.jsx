@@ -9,7 +9,9 @@ const [response , setResponse] = useState("");
 const [searchResponse , setSearchResponse] = useState("");
 const [search , setSearch] = useState("");
 const [updateResponse , setUpdateResponse] = useState("");
-const [removeResponse , setRemoveResponse]= useState("")
+const [removeResponse , setRemoveResponse]= useState("");
+const [authResponse , setAuthResponse] = useState("");
+
 
 //properties
 const [patient , setAppointmentPatient] = useState("");
@@ -37,6 +39,7 @@ useEffect(() => {
       setAppointments(data.appointments);
        
     } catch (error) {
+      if(error.response.data.msg == "Authentication Invalid") setAuthResponse("Authentication Invalid , Please login or register first")
       console.error("Error fetching data:", error);
     }
   }
@@ -114,7 +117,7 @@ async function addAppointment(e){
 
   }catch(error){
       if(error.status === 404) setResponse("server Error , check doctor ID or Patient ID")
-      else setResponse(error.message)
+      else setResponse(error.response.data.msg);
   }
 }
 
@@ -137,7 +140,7 @@ async function SearchAppointment(e){
       setSearchResponse(`no appointment with the ID : ${search}`)        
     }
   }catch(error){
-       console.log(error);
+      setSearchResponse(error.response.data.msg);
   }
 }
 
@@ -241,6 +244,9 @@ async function UpdateAppointment(id){
 
               <Button onClick={SearchAppointment} className={`mr-2`}>Search</Button>
           </div>
+
+          <p className="text-red-700 text-center mt-10 font-semibold text-2xl">{authResponse}</p>
+
           <p className="text-white text-center mt-10 font-semibold text-2xl">{searchResponse}</p>          
           <ul
            className="flex flex-col gap-18 lg:gap-5 xl:gap-5 mt-10 items-center text-xl lg:text-2xl xl:text-2xl ">{
@@ -286,6 +292,7 @@ async function UpdateAppointment(id){
                     <Button onClick={()=>setUpdate(update===index ? null : index)}>{update !==index?"Update Appointment":"Cancel"}</Button>
                   </div>
                   <p className="text-red-700 text-center mt-10 font-semibold text-2xl">{update ===index? updateResponse:""}</p>
+                  <p className="text-red-700 text-center mt-10 font-semibold text-2xl">{update === index? removeResponse : ""}</p>
                 </div>
               ))
             }</ul>
