@@ -1,11 +1,18 @@
+import Login from "../Pages/Login";
 import Button from "./Button"
 import Navbar from "./Navbar"
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 const Header = () => {
 
   const [isOpen , setIsOpen] = useState(false);
   function handleNavBar(){
       setIsOpen(!isOpen);
+  }
+
+  const navigate = useNavigate();
+  function handleNavigation(destination){
+    navigate(`/${destination}`);
   }
 
   return (
@@ -15,8 +22,8 @@ const Header = () => {
     ${isOpen ? 'max-h-[500px] opacity-100 w-full' : 'max-h-0 w-full opacity-0'}`}
   /> 
         <div className="flex justify-center items-center ">
-            <Button href={"/api/v1/appointments"}>Sign In</Button>
-            <Button>Register</Button>
+            <Button onClick={()=>handleNavigation("login")}>Sign In</Button>
+            <Button onClick={()=>handleNavigation("register")}>Register</Button>
             <Button className="lg:hidden xl:hidden block" onClick={handleNavBar}>☰</Button>
         </div>
       

@@ -10,7 +10,7 @@ const Section = ({ home, head, dark, children}) => {
       className={` top-[100px] lg:top-auto xl:top-auto ${
         home && home == true ? "h-[500px]" : "h-fit"
       }
-     w-[90%] ml-[5%] mt-18 rounded-xl bg-gradient-to-r from-[#0a3d6d] via-[#092137] to-[#050E6E]`}
+     w-[90%] ml-[5%] mt-18 rounded-xl bg-gradient-to-r from-[#0a3d6d] via-[#092137] to-[#2D336B]`}
     >
       <h1
         className={`text-3xl text-center pt-10 underline ${
